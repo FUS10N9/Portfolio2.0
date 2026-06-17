@@ -63,14 +63,14 @@ export const Home = () => {
           </div>
           <div className="footer-right">
             <div className="footer-col">
-              <h4 className="footer-col-title">Navigation</h4>
+              <h4 className="footer-col-title" style={{fontFamily:"mokoto"}}>Navigation</h4>
               <span className="footer-link">Services</span>
               <span className="footer-link">About</span>
               <span className="footer-link">Work</span>
               <span className="footer-link">Contact</span>
             </div>
             <div className="footer-col">
-              <h4 className="footer-col-title">Socials</h4>
+              <h4 className="footer-col-title" style={{fontFamily:"mokoto"}}>Socials</h4>
               <a href="https://www.instagram.com/dhruv_s_inventory/" className="footer-link" target="_blank" rel="noreferrer">Instagram</a>
               <a href="https://www.linkedin.com/in/dhrubajyoti-roy-293755320/" className="footer-link" target="_blank" rel="noreferrer">LinkedIn</a>
               <a href="https://discord.com/users/1056459569238392904" className="footer-link" target="_blank" rel="noreferrer">Discord</a>
@@ -171,11 +171,11 @@ const ParallexText = () => {
 
   // --- MOBILE PARALLAX CONFIGURATION ---
   // You can change the mobile parallax scroll ranges and translation targets here
-  const mY1 = useTransform(scrollY, [0, 600], [0, 170]);
-  const mY2 = useTransform(scrollY, [0, 500], [0, -20]);
-  const mY3 = useTransform(scrollY, [0, 850], [0, 140]);
-  const mY4 = useTransform(scrollY, [0, 900], [0, 115]);
-  const mY5 = useTransform(scrollY, [0, 900], [0, 100]);
+  const mY1 = useTransform(scrollY, [0, 600], [0, 200]);
+  const mY2 = useTransform(scrollY, [0, 500], [0, -5]);
+  const mY3 = useTransform(scrollY, [0, 850], [0, 200]);
+  const mY4 = useTransform(scrollY, [0, 900], [0, 175]);
+  const mY5 = useTransform(scrollY, [0, 900], [0, 160]);
 
   const y1 = isMobile ? mY1 : dY1;
   const y2 = isMobile ? mY2 : dY2;
@@ -190,7 +190,7 @@ const ParallexText = () => {
       </motion.h1>
 
       <motion.h1 className="Player" style={{ y: y4, scale: 1 }}>
-        PLAYER
+        user
       </motion.h1>
 
       <motion.p className="Name" style={{ y: y3, scale: 1 }}>
