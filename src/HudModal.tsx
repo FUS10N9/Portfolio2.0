@@ -40,8 +40,11 @@ export const annotationContent: Record<string, ModalContent> = {
     title: <div style={{paddingLeft:"8px",display:"flex",gap:"5px"}}>
       <span style={{fontFamily:"mokoto"}}>PROJECTS</span>
       </div>,
-    body: `Figma & UI Prototyping · Photoshop Graphics · BMW-Blender 
-     ·Social Interaction Platform`,
+    body: `· Figma & UI Prototyping 
+    · Motion Designing
+    · Photoshop Graphics 
+    · Blender 
+    · Social Interaction Platform`,
     code: "PRJ/042",
   },
   "left-stick": {
@@ -100,14 +103,14 @@ export const annotationContent: Record<string, ModalContent> = {
     title:  <div style={{paddingLeft:"8px",display:"flex",gap:"5px"}}>
       <span style={{fontFamily:"mokoto"}}>SOCIALS</span>
       </div>,
-    body: <div style={{paddingLeft:"15px",display:"flex",gap:"12px"}}>
-      <a href="#" style={{color:"#9ca3af"}}><FaGithub size={44}/></a>
-      <a href="#" style={{color:"#9ca3af"}}><FaInstagram size={45}/></a>
-      <a href="#" style={{color:"#9ca3af"}}><IoLogoLinkedin size={45}/></a>
-      <a href="#" style={{color:"#9ca3af"}}> <BsTwitterX size={40}/></a>
-      <a href="#" style={{color:"#9ca3af"}}><FaDiscord size={52} style={{marginTop:"-6"}}/></a>
-      <a href="#" style={{color:"#9ca3af"}}><BiLogoGmail size={54} style={{marginTop:"-10"}}/></a>
-      <a href="#" style={{color:"#9ca3af"}}><FaSpotify size={42} style={{marginTop:"-4"}}></FaSpotify></a>
+    body: <div style={{paddingLeft:"15px",display:"flex",gap:"22px"}}>
+      <a href="https://github.com/FUS10N9" style={{color:"#9ca3af"}}><FaGithub size={45}/></a>
+      <a href="https://www.instagram.com/dhruv_s_inventory/" style={{color:"#9ca3af"}}><FaInstagram size={45}/></a>
+      <a href="https://www.linkedin.com/in/dhrubajyoti-roy-293755320/" style={{color:"#9ca3af"}}><IoLogoLinkedin size={45}/></a>
+      <a href="https://x.com/Dhrubaj26486032" style={{color:"#9ca3af"}}> <BsTwitterX size={45}/></a>
+      <a href="https://discord.com/users/1056459569238392904" style={{color:"#9ca3af"}}><FaDiscord size={45} style={{marginTop:"0"}}/></a>
+      <a href="#" style={{color:"#9ca3af"}}><BiLogoGmail size={45} style={{marginTop:"0"}}/></a>
+      <a href="https://open.spotify.com/user/31r6jryeedlfcu6dpjfipw6qbcre?si=db99555294ed46fe" style={{color:"#9ca3af"}}><FaSpotify size={45} style={{marginTop:"0"}}></FaSpotify></a>
       </div>,
     code: "CNT/099",
   },
