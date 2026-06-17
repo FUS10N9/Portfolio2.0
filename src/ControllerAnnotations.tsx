@@ -1,5 +1,5 @@
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import "./ControllerAnnotations.css";
 import { HudModal } from "./HudModal";
 
@@ -16,7 +16,7 @@ import { HudModal } from "./HudModal";
 type Annotation = {
   id: string;
   num: string;
-  text:  React.ReactNode;
+  text: React.ReactNode;
   sub?: React.ReactNode;
   angle: number;      // degrees, 0 = right, -90 = top
   side: 'left' | 'right';
@@ -184,7 +184,7 @@ const Annotation2D = ({
       </motion.div>
 
       {/* Target dot at inner end (near controller center) */}
-      
+
     </motion.div>
   );
 };
@@ -193,14 +193,37 @@ const Annotation2D = ({
 export const ControllerAnnotations = () => {
   const [selectedId, setSelectedId] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const audioOpenRef = useRef<HTMLAudioElement | null>(null);
+  const audioCloseRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    audioOpenRef.current = new Audio("/sound/47313572-sci-fi-launch-5-351240.mp3");
+    audioCloseRef.current = new Audio("/sound/closing.mp3");
+  }, []);
+
+  const playOpenSfx = () => {
+    if (audioOpenRef.current) {
+      audioOpenRef.current.currentTime = 0;
+      audioOpenRef.current.play().catch(e => console.log("Audio play failed:", e));
+    }
+  };
+
+  const playCloseSfx = () => {
+    if (audioCloseRef.current) {
+      audioCloseRef.current.currentTime = 0;
+      audioCloseRef.current.play().catch(e => console.log("Audio play failed:", e));
+    }
+  };
 
   const handleLabelClick = (id: string) => {
     setSelectedId(id);
     setIsModalOpen(true);
+    playOpenSfx();
   };
 
   const handleClose = () => {
     setIsModalOpen(false);
+    playCloseSfx();
     // Delay clearing ID so exit animation uses correct content
     setTimeout(() => setSelectedId(null), 400);
   };
