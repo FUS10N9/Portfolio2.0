@@ -1,0 +1,243 @@
+/* ===== Sci-Fi Callout System ===== */
+
+.annotations-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 10;
+}
+
+.annotation-2d {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+/* SVG fills the overlay for percentage-based coordinates */
+.annotation-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.annotation-svg line {
+  vector-effect: non-scaling-stroke;
+}
+
+/* ── Label Card ── */
+.callout-label {
+  position: absolute;
+  /* transform is set inline via JS for radial positioning */
+  display: flex;
+  flex-direction: row; /* left to right */
+  align-items: center;
+  gap: 12px;
+  padding: 10px 16px;
+  background: rgba(17, 17, 17, 0.85); /* dark bg like the panel */
+  border: 1px solid rgba(242, 242, 242, 0.15);
+  /* Top-left clipped folder corner */
+  clip-path: polygon(
+    0 10px,
+    10px 0,
+    100% 0,
+    100% 100%,
+    0 100%
+  );
+  transition: all 0.25s ease;
+}
+
+.callout-label::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid rgba(242, 242, 242, 0.3);
+  clip-path: polygon(
+    0 10px,
+    10px 0,
+    100% 0,
+    100% 100%,
+    0 100%
+  );
+  pointer-events: none;
+}
+
+/* to draw the extra line over the clip if desired */
+.callout-label::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  left: -2px;
+  width: 15px;
+  height: 1px;
+  background-color: rgba(242, 242, 242, 0.3);
+  transform: rotate(-45deg);
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+/* Clickable variant */
+.callout-label.callout-clickable {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* removing hover glow, adding subtle brightness */
+.callout-label.callout-clickable:hover {
+  background: rgba(30, 30, 30, 0.95);
+  border-color: rgba(255, 255, 255, 0.4);
+  scale: 1.05;
+}
+
+.callout-label.callout-clickable:active {
+  scale: 0.97;
+}
+
+/* Radial alignment helpers (text direction only) */
+.callout-align-left {
+  text-align: right;
+}
+.callout-align-right {
+  text-align: left;
+}
+
+/* ── Typgraphy & Layout inside card ── */
+.callout-num {
+  font-family: 'Roboto Mono', 'Courier New', monospace;
+  font-size: 24px;
+  font-weight: 300;
+  color: #FFFFFF;
+  letter-spacing: 0.05em;
+  padding-right: 12px;
+  border-right: 1px solid rgba(242, 242, 242, 0.2);
+}
+
+.callout-text-container {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.callout-sub {
+  font-family: 'Roboto Mono', 'Courier New', monospace;
+  font-size: 8px;
+  font-weight: 500;
+  color: #8A8A8A;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+}
+
+.callout-id {
+  font-family: 'Roboto Mono', 'Courier New', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #FFFFFF;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+/* ── Target Dot ── */
+.callout-dot {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dot-core {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  box-shadow: 0 0 6px rgba(255, 255, 255, 0.5);
+}
+
+.dot-ring {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  border: 1px solid rgba(250, 250, 250, 0.3);
+  border-radius: 50%;
+  animation: dotPulse 2.5s ease-in-out infinite;
+}
+
+@keyframes dotPulse {
+  0%, 100% {
+    transform: scale(1);
+    opacity: 0.4;
+  }
+  50% {
+    transform: scale(1.6);
+    opacity: 0;
+  }
+}
+
+/* ── Responsive ── */
+@media (max-width: 768px) {
+  .annotations-overlay {
+    display: none;
+  }
+}
+
+/* ── Mobile Responsive (max-width: 475px) ── */
+@media (max-width: 475px) {
+  .annotations-overlay {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto auto;
+    grid-auto-flow: column;
+    position: relative;
+    gap: 8px;
+    padding: 12px 8px;
+    z-index: 10;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .annotation-2d {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  /* Hide the SVG lines on mobile */
+  .annotation-svg {
+    display: none;
+  }
+
+  /* Hide the dot */
+  .callout-dot {
+    display: none;
+  }
+
+  .callout-label {
+    position: relative;
+    left: auto !important;
+    top: auto !important;
+    transform: none !important;
+    padding: 8px;
+    gap: 6px;
+    width: 100%;
+    box-sizing: border-box;
+    white-space: normal;
+  }
+
+  .callout-num {
+    font-size: 14px;
+    padding-right: 6px;
+  }
+
+  .callout-sub {
+    font-size: 6px;
+  }
+
+  .callout-id {
+    font-size: 9px;
+    letter-spacing: 0.1em;
+    word-break: break-word;
+  }
+}

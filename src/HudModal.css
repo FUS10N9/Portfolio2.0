@@ -1,0 +1,595 @@
+/* ===== Cinematic FUI HUD ===== */
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&display=swap');
+
+/* Base Colors and Typography */
+:root {
+  --fui-bg: #050505;
+  --fui-panel: #111111;
+  --fui-panel-light: #181818;
+  --fui-line: rgba(242, 242, 242, 0.15);
+  --fui-line-strong: rgba(242, 242, 242, 0.4);
+  --fui-text-primary: #FFFFFF;
+  --fui-text-secondary: #8A8A8A;
+  --fui-font: 'Roboto Mono', 'Courier New', monospace;
+}
+
+/* ── Backdrop ── */
+.fui-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background-color: var(--fui-bg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: default;
+  font-family: var(--fui-font);
+  text-transform: uppercase;
+  color: var(--fui-text-primary);
+  overflow: hidden;
+}
+
+/* ── Background Effects ── */
+.fui-bg-grid {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(var(--fui-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--fui-line) 1px, transparent 1px);
+  background-size: 40px 40px;
+  opacity: 0.12;
+  pointer-events: none;
+}
+
+.fui-bg-scanlines {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    transparent,
+    transparent 2px,
+    rgba(255, 255, 255, 0.02) 2px,
+    rgba(255, 255, 255, 0.02) 4px
+  );
+  pointer-events: none;
+}
+
+.fui-bg-noise {
+  position: absolute;
+  inset: 0;
+  background-image: url('data:image/svg+xml,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.8" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
+  opacity: 0.03;
+  mix-blend-mode: overlay;
+  pointer-events: none;
+}
+
+/* ── Large Context Title ── */
+.fui-context-title {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 15vw;
+  font-weight: 700;
+  color: var(--fui-text-primary);
+  letter-spacing: 0.3em;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 1;
+}
+
+/* ── Framework container ── */
+.fui-framework {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* ── Top Left Metadata ── */
+.fui-top-left {
+  position: absolute;
+  top: 40px;
+  left: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.fui-metadata {
+  font-size: 10px;
+  color: var(--fui-text-secondary);
+  letter-spacing: 0.15em;
+  font-weight: 500;
+}
+
+/* ── Left Vertical Sidebar ── */
+.fui-left-sidebar {
+  position: absolute;
+  left: 40px;
+  top: 45%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  border-left: 1px solid var(--fui-line-strong);
+  padding-left: 16px;
+  height: 60vh;
+}
+
+.fui-sys-info {
+  font-size: 10px;
+  color: var(--fui-text-secondary);
+  letter-spacing: 0.1em;
+  margin-bottom: 30px;
+}
+
+.fui-nav {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.fui-nav-item {
+  font-size: 10px;
+  color: var(--fui-text-secondary);
+  letter-spacing: 0.2em;
+  position: relative;
+  cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.fui-nav-item:hover, .fui-nav-item.active {
+  color: var(--fui-text-primary);
+}
+
+.fui-nav-item.active::before {
+  content: '';
+  position: absolute;
+  left: -17px;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--fui-text-primary);
+}
+
+.fui-sys-monitor {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 10px;
+  color: var(--fui-text-secondary);
+  letter-spacing: 0.1em;
+  white-space: nowrap;
+}
+
+.fui-divider {
+  width: 40px;
+  height: 1px;
+  background-color: var(--fui-line);
+}
+
+/* ── Top Right Readout ── */
+.fui-top-right {
+  position: absolute;
+  top: 40px;
+  right: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+.fui-signal-bars {
+  display: flex;
+  align-items: flex-end;
+  gap: 3px;
+  height: 10px;
+}
+
+.fui-signal-bar {
+  width: 2px;
+  background-color: var(--fui-text-secondary);
+}
+
+/* ── Right Side Vertical Markers ── */
+.fui-right-sidebar {
+  position: absolute;
+  right: 40px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.fui-marker {
+  width: 3px;
+  height: 3px;
+  background-color: var(--fui-line-strong);
+}
+
+.fui-marker.active {
+  background-color: var(--fui-text-primary);
+}
+
+/* ── Main Content Floating Window ── */
+.fui-panel {
+  width: min(90vw, 600px);
+  background-color: var(--fui-panel);
+  border: 1px solid var(--fui-line);
+  position: relative;
+  /* Clipped folder-like corner (top left) */
+  clip-path: polygon(
+    0 24px,
+    24px 0,
+    100% 0,
+    100% 100%,
+    0 100%
+  );
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5); /* subtle shadow */
+  margin-left: 10vw; /* Offset to the right */
+}
+
+/* Inner border effect for the clipped corner */
+.fui-panel::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border: 1px solid var(--fui-line-strong);
+  clip-path: polygon(
+    0 24px,
+    24px 0,
+    100% 0,
+    100% 100%,
+    0 100%
+  );
+  pointer-events: none;
+}
+
+/* Additional decor line on the clip */
+.fui-panel::after {
+  content: '';
+  position: absolute;
+  top: 11px;
+  left: -2px;
+  width: 34px;
+  height: 1px;
+  background-color: var(--fui-line-strong);
+  transform: rotate(-45deg);
+  transform-origin: left center;
+  pointer-events: none;
+}
+
+/* Window Header */
+.fui-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 24px 32px 16px;
+  border-bottom: 1px solid var(--fui-line);
+  margin-left: 16px; /* offset for the clipped corner */
+}
+
+.fui-header-labels {
+  display: flex;
+  gap: 24px;
+}
+
+.fui-header-label {
+  font-size: 9px;
+  color: var(--fui-text-secondary);
+  letter-spacing: 0.15em;
+  font-weight: 500;
+}
+
+.fui-header-label.active {
+  color: var(--fui-text-primary);
+}
+
+.fui-close-btn {
+  background: transparent;
+  border: 1px solid var(--fui-line-strong);
+  color: var(--fui-text-secondary);
+  font-size: 10px;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.fui-close-btn:hover {
+  color: var(--fui-text-primary);
+  border-color: var(--fui-text-primary);
+  background-color: rgba(255, 255, 255, 0.05);
+}
+
+/* Window Content */
+.fui-panel-content {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.fui-content-title {
+  font-size: 20px;
+  color: var(--fui-text-primary);
+  letter-spacing: 0.25em;
+  font-weight: 400;
+}
+
+.fui-content-meta {
+  font-size: 10px;
+  color: var(--fui-text-secondary);
+  letter-spacing: 0.15em;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--fui-line);
+}
+
+.fui-tech-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 1px; /* border space */
+  background-color: var(--fui-line);
+  padding: 1px;
+}
+
+.fui-tech-row {
+  display: flex;
+  justify-content: space-between;
+  background-color: var(--fui-panel);
+  padding: 12px 16px;
+}
+
+.fui-row-label {
+  font-size: 10px;
+  color: var(--fui-text-secondary);
+  letter-spacing: 0.1em;
+}
+
+.fui-row-value {
+  font-size: 10px;
+  color: var(--fui-text-primary);
+  letter-spacing: 0.1em;
+}
+
+.fui-content-body {
+  margin-top: 16px;
+  font-size: 11px;
+  color: var(--fui-text-secondary);
+  line-height: 1.8;
+  letter-spacing: 0.05em;
+  text-transform: none;
+  background-color: var(--fui-panel);
+  padding: 16px 0 0 0;
+  white-space: pre-line;
+}
+
+.fui-panel-bottom-bar {
+  display: flex;
+  gap: 8px;
+  margin-top: 8px;
+  justify-content: flex-end;
+}
+
+.fui-panel-bottom-hash {
+  width: 2px;
+  height: 6px;
+  background-color: var(--fui-line-strong);
+}
+
+/* ── Image Gallery Flex ── */
+.fui-image-gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  width: 100%;
+}
+
+.fui-image-card {
+  flex: 1 1 calc(50% - 12px);
+  min-width: 120px;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--fui-line);
+  background-color: var(--fui-panel-light);
+  transition: border-color 0.3s ease, transform 0.3s ease;
+  cursor: pointer;
+}
+
+.fui-image-card:hover {
+  border-color: var(--fui-line-strong);
+  transform: scale(1.02);
+}
+
+.fui-image-card img {
+  width: 100%;
+  height: 140px;
+  object-fit: cover;
+  display: block;
+  filter: grayscale(0.3) brightness(0.85);
+  transition: filter 0.3s ease;
+}
+
+.fui-image-card:hover img {
+  filter: grayscale(0) brightness(1);
+}
+
+.fui-image-label {
+  display: block;
+  padding: 8px 10px;
+  font-size: 9px;
+  letter-spacing: 0.15em;
+  color: var(--fui-text-secondary);
+  background-color: var(--fui-panel);
+  border-top: 1px solid var(--fui-line);
+  text-align: center;
+  font-family: var(--fui-font);
+  text-transform: uppercase;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .fui-backdrop {
+    display: none;
+  }
+}
+
+/* ── Mobile Responsive (max-width: 475px) ── */
+@media (max-width: 475px) {
+  .fui-backdrop {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 0;
+    overflow-y: auto;
+  }
+
+  /* Hide decorative sidebars on mobile */
+  .fui-left-sidebar,
+  .fui-right-sidebar,
+  .fui-bg-grid {
+    display: none;
+  }
+
+  .fui-top-left {
+    top: 12px;
+    left: 12px;
+  }
+
+  .fui-top-right {
+    top: 12px;
+    right: 12px;
+  }
+
+  .fui-metadata {
+    font-size: 8px;
+  }
+
+  .fui-context-title {
+    font-size: 28vw;
+    letter-spacing: 0.15em;
+  }
+
+  .fui-framework {
+    align-items: flex-start;
+    padding-top: 50px;
+  }
+
+  .fui-panel {
+    width: calc(100vw - 24px);
+    margin-left: 0;
+    margin: 50px 12px 24px;
+    clip-path: polygon(
+      0 16px,
+      16px 0,
+      100% 0,
+      100% 100%,
+      0 100%
+    );
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+  }
+
+  .fui-panel::after {
+    top: 7px;
+    width: 23px;
+  }
+
+  .fui-panel-header {
+    padding: 16px 16px 12px;
+    margin-left: 10px;
+  }
+
+  .fui-header-labels {
+    gap: 12px;
+  }
+
+  .fui-header-label {
+    font-size: 7px;
+    letter-spacing: 0.1em;
+  }
+
+  .fui-close-btn {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .fui-panel-content {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .fui-content-title {
+    font-size: 14px;
+    letter-spacing: 0.15em;
+  }
+
+  .fui-content-meta {
+    font-size: 8px;
+    padding-bottom: 10px;
+  }
+
+  .fui-tech-row {
+    padding: 8px 10px;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .fui-row-label {
+    font-size: 8px;
+  }
+
+  .fui-row-value {
+    font-size: 9px;
+  }
+
+  .fui-content-body {
+    font-size: 10px;
+    line-height: 1.7;
+    margin-top: 8px;
+  }
+
+  /* Image gallery: single column on mobile */
+  .fui-image-gallery {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .fui-image-card {
+    flex: 1 1 100%;
+    min-width: unset;
+  }
+
+  .fui-image-card img {
+    height: 120px;
+  }
+
+  .fui-image-label {
+    font-size: 8px;
+    padding: 6px 8px;
+  }
+
+  /* Tech stack & social icons: wrap and resize on mobile */
+  .fui-content-body > div {
+    flex-wrap: wrap !important;
+    gap: 10px !important;
+  }
+
+  .fui-content-body svg {
+    width: 26px !important;
+    height: 26px !important;
+  }
+}

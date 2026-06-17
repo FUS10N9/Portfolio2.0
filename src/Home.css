@@ -105,3 +105,167 @@
   margin-right: 70px;
   margin-top: -100px;
 }
+
+#lt{
+  font-family: 'Mokoto', cursive;
+}
+
+/* ── Footer ── */
+.footer {
+  width: 100%;
+  background-color: #050505;
+  border-top: 1px solid rgba(242, 242, 242, 0.15);
+  padding: 2rem 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: 'Roboto Mono', 'Courier New', monospace;
+}
+
+.footer-content {
+  width: 90%;
+  max-width: 1200px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.footer-text {
+  color: #8a8a8a;
+  font-size: 0.85rem;
+  letter-spacing: 0.1em;
+  margin: 0;
+}
+
+.footer-links {
+  display: flex;
+  gap: 2rem;
+}
+
+.footer-links a {
+  color: #ffffff;
+  text-decoration: none;
+  font-size: 0.85rem;
+  letter-spacing: 0.15em;
+  transition: color 0.3s ease;
+}
+
+.footer-links a:hover {
+  color: #8a8a8a;
+}
+
+/* ── Mobile Responsive (max-width: 475px) ── */
+@media (max-width: 475px) {
+  .nav {
+    padding: 0.6rem 1rem;
+  }
+
+  .Title {
+    font-size: 0.85rem;
+    margin-left: 8px;
+    margin-top: 8px;
+  }
+
+  .time {
+    font-size: 0.7rem;
+    margin-top: -45px;
+    margin-right: 8px;
+  }
+
+  .InHero {
+    height: calc(800px + 100vh);
+  }
+
+  .parallexText {
+    left: 0;
+    right: 0;
+    text-align: center;
+  }
+
+  .Welcome {
+    font-size: 1.4rem;
+    margin-left: 20px;
+  }
+
+  .Player {
+    font-size: 1.3rem;
+    margin: -25px 0 0 20px;
+  }
+
+  .Name {
+    font-size: 1.8rem;
+    margin: -10px 0 0 20px;
+  }
+
+  .Role {
+    position: relative;
+    margin-right: 0;
+    margin-top: 10px;
+    margin-left: 20px;
+    right: auto;
+    font-size: 0.85rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  .Role .role-item {
+    margin-right: 0 !important;
+    margin-top: 0 !important;
+    scale: 1 !important;
+  }
+
+  .Quote {
+    position: relative;
+    margin-right: 0;
+    margin-top: 10px;
+    margin-left: 20px;
+    right: auto;
+    font-size: 0.75rem;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0;
+  }
+
+  .Quote .quote-item {
+    margin-right: 0 !important;
+    margin-top: 0 !important;
+    scale: 1 !important;
+  }
+
+  .Connect {
+    margin-left: 20px !important;
+    margin-top: 20px !important;
+    scale: 0.8 !important;
+  }
+
+  .Social {
+    margin-left: 20px !important;
+    margin-top: 0 !important;
+    scale: 0.7 !important;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .UnderHero {
+    height: 100vh;
+  }
+
+  .footer-content {
+    flex-direction: column;
+    gap: 1rem;
+    text-align: center;
+  }
+  
+  .footer-text {
+    font-size: 0.65rem;
+  }
+  
+  .footer-links {
+    gap: 1rem;
+  }
+  
+  .footer-links a {
+    font-size: 0.7rem;
+  }
+}

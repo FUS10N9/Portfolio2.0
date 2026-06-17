@@ -14,12 +14,13 @@ import { FaGithub } from "react-icons/fa";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, useGLTF } from "@react-three/drei";
 import * as THREE from "three";
+import { ControllerAnnotations } from "./ControllerAnnotations";
 
 // Global mouse state
 const mouseState = {
   x: 0,
   y: 0,
-  isMoving: false,
+  isDragging: false,
 };
 
 export const Home = () => {
@@ -28,6 +29,7 @@ export const Home = () => {
       <Nav />
       <Hero />
       <GameControllerSection />
+      <Footer />
     </div>
   );
 };
@@ -107,16 +109,17 @@ const ParallexText = () => {
       </motion.p>
 
       <motion.p className="Role" style={{ y: y3, scale: 1 }}>
-        <p style={{ marginRight: -150, marginTop: -2, fontFamily: "Mokoto", scale: 1.5 }}>
+        <p className="role-item" style={{ marginRight: -150, marginTop: -2, fontFamily: "Mokoto", scale: 1.5 }}>
           DESIGNER /
         </p>
-        <p style={{ marginRight: 30, fontFamily: "Mokoto", scale: 1.5 }}>
+        <p className="role-item" style={{ marginRight: 30, fontFamily: "Mokoto", scale: 1.5 }}>
           DEVELOPER
         </p>
       </motion.p>
 
       <motion.h1 className="Quote" style={{ y: y1, scale: 1 }}>
         <p
+          className="quote-item"
           style={{
             marginRight: -145,
             marginTop: -2,
@@ -127,7 +130,7 @@ const ParallexText = () => {
           {" "}
           "RESPAWNING IDEAS TO MAKE THEM
         </p>
-        <p style={{ marginRight: 0, fontFamily: "Mokoto", scale: 1.1 }}>
+        <p className="quote-item" style={{ marginRight: 0, fontFamily: "Mokoto", scale: 1.1 }}>
           LEGENDARY"
         </p>
       </motion.h1>
@@ -137,6 +140,7 @@ const ParallexText = () => {
         style={{ y: y2, scale: 0.5, marginTop: 150, marginLeft: -370 }}
       >
         <CgDanger style={{ color: "yellow", marginTop: 10 }} /> Connect with me
+
       </motion.h1>
 
       <motion.h1
@@ -160,20 +164,29 @@ const ParallexText = () => {
   );
 };
 
-// Controller model with rotation handler
+// Controller model with drag-to-rotate and spring-back reset
 function Model(props: any) {
   const { nodes, materials } = useGLTF('/xbox_controller.glb')
   const groupRef = useRef<THREE.Group>(null)
-  const resetTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
-  useFrame(() => {
+  useFrame((state) => {
     if (groupRef.current) {
-      // Smooth rotation based on mouse position
-      const targetRotationX = mouseState.y * Math.PI * 0.4
-      const targetRotationY = mouseState.x * Math.PI * 0.6
+      // Add a subtle continuous floating animation
+      const t = state.clock.getElapsedTime()
+      groupRef.current.position.y = Math.sin(t * 1.5) * 0.06
 
-      groupRef.current.rotation.x += (targetRotationX - groupRef.current.rotation.x) * 0.1
-      groupRef.current.rotation.y += (targetRotationY - groupRef.current.rotation.y) * 0.1
+      if (mouseState.isDragging) {
+        // While dragging: rotate toward the target offset
+        const targetRotationX = mouseState.y * Math.PI * 0.4
+        const targetRotationY = mouseState.x * Math.PI * 0.6
+
+        groupRef.current.rotation.x += (targetRotationX - groupRef.current.rotation.x) * 0.1
+        groupRef.current.rotation.y += (targetRotationY - groupRef.current.rotation.y) * 0.1
+      } else {
+        // Not dragging: smoothly spring back to default (0, 0, 0)
+        groupRef.current.rotation.x += (0 - groupRef.current.rotation.x) * 0.08
+        groupRef.current.rotation.y += (0 - groupRef.current.rotation.y) * 0.08
+      }
     }
   })
 
@@ -198,149 +211,84 @@ function Model(props: any) {
 
 useGLTF.preload('/xbox_controller.glb')
 
-// Canvas event handler component
+// Canvas event handler — handles both mouse and touch for mobile support
 function CanvasEventHandler({ canvasRef }: { canvasRef: React.RefObject<HTMLDivElement> }) {
   const { gl } = useThree()
-  const resetTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   React.useEffect(() => {
     const canvas = gl.domElement
-    
+
+    // --- Mouse Handlers ---
+    const handleMouseDown = (e: MouseEvent) => {
+      if (e.button !== 0) return
+      mouseState.isDragging = true
+    }
+
     const handleMouseMove = (e: MouseEvent) => {
-      if (!canvasRef.current) return
-      
+      // Only update rotation values when dragging
+      if (!mouseState.isDragging || !canvasRef.current) return
       const rect = canvasRef.current.getBoundingClientRect()
       const x = (e.clientX - rect.left) / rect.width - 0.5
       const y = (e.clientY - rect.top) / rect.height - 0.5
-
       mouseState.x = x
       mouseState.y = y
-      mouseState.isMoving = true
-
-      if (resetTimeoutRef.current) {
-        clearTimeout(resetTimeoutRef.current)
-      }
-
-      resetTimeoutRef.current = setTimeout(() => {
-        mouseState.x = 0
-        mouseState.y = 0
-        mouseState.isMoving = false
-      }, 2000)
     }
 
-    const handleMouseLeave = () => {
+    // --- Touch Handlers ---
+    const handleTouchStart = (e: TouchEvent) => {
+      // Only track single touches for rotation
+      if (e.touches.length > 1) return;
+      mouseState.isDragging = true
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (!mouseState.isDragging || !canvasRef.current) return
+      // Prevent scrolling while rotating the controller
+      if (e.cancelable) {
+        e.preventDefault()
+      }
+      const touch = e.touches[0]
+      const rect = canvasRef.current.getBoundingClientRect()
+      const x = (touch.clientX - rect.left) / rect.width - 0.5
+      const y = (touch.clientY - rect.top) / rect.height - 0.5
+      mouseState.x = x
+      mouseState.y = y
+    }
+
+    // --- Shared Reset ---
+    const handleReset = () => {
+      mouseState.isDragging = false
       mouseState.x = 0
       mouseState.y = 0
-      mouseState.isMoving = false
-      
-      if (resetTimeoutRef.current) {
-        clearTimeout(resetTimeoutRef.current)
-      }
     }
 
+    canvas.addEventListener('mousedown', handleMouseDown)
     canvas.addEventListener('mousemove', handleMouseMove)
-    canvas.addEventListener('mouseleave', handleMouseLeave)
+    canvas.addEventListener('mouseleave', handleReset)
+    window.addEventListener('mouseup', handleReset)
+
+    canvas.addEventListener('touchstart', handleTouchStart, { passive: false })
+    canvas.addEventListener('touchmove', handleTouchMove, { passive: false })
+    canvas.addEventListener('touchend', handleReset)
+    canvas.addEventListener('touchcancel', handleReset)
 
     return () => {
+      canvas.removeEventListener('mousedown', handleMouseDown)
       canvas.removeEventListener('mousemove', handleMouseMove)
-      canvas.removeEventListener('mouseleave', handleMouseLeave)
+      canvas.removeEventListener('mouseleave', handleReset)
+      window.removeEventListener('mouseup', handleReset)
+
+      canvas.removeEventListener('touchstart', handleTouchStart)
+      canvas.removeEventListener('touchmove', handleTouchMove)
+      canvas.removeEventListener('touchend', handleReset)
+      canvas.removeEventListener('touchcancel', handleReset)
     }
   }, [gl, canvasRef])
 
   return null
 }
 
-// 2D Annotation labels — 3 left, 3 right
-// Each label has: text, label position (%), point on controller (%), and side
-const annotations: {
-  id: string;
-  text: string;
-  labelX: number;
-  labelY: number;
-  pointX: number;
-  pointY: number;
-  side: 'left' | 'right';
-}[] = [
-  // LEFT SIDE (3 labels)
-  { id: 'lt', text: 'LT', labelX: 6, labelY: 25, pointX: 33, pointY: 25, side: 'left' },
-  { id: 'lb', text: 'LB', labelX: 6, labelY: 35, pointX: 33, pointY: 35, side: 'left' },
-  { id: 'left-stick', text: 'L STICK', labelX: 6, labelY: 55, pointX: 35, pointY: 55, side: 'left' },
-  // RIGHT SIDE (3 labels)
-  { id: 'rt', text: 'RT', labelX: 94, labelY: 25, pointX: 67, pointY: 25, side: 'right' },
-  { id: 'rb', text: 'RB', labelX: 94, labelY: 35, pointX: 67, pointY: 35, side: 'right' },
-  { id: 'buttons', text: 'A B X Y', labelX: 94, labelY: 50, pointX: 64, pointY: 50, side: 'right' },
-];
 
-// Individual 2D annotation — pure HTML/CSS, no SVG
-const Annotation2D = ({
-  label,
-  index,
-}: {
-  label: typeof annotations[0];
-  index: number;
-}) => {
-  const isLeft = label.side === 'left';
-
-  // Horizontal line from label to point
-  const lineLeft = isLeft ? label.labelX : label.pointX;
-  const lineWidth = isLeft
-    ? label.pointX - label.labelX
-    : label.labelX - label.pointX;
-
-  return (
-    <motion.div
-      className="annotation-2d"
-      initial={{ opacity: 0, x: isLeft ? -20 : 20 }}
-      whileInView={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.6, delay: 0.15 + index * 0.1, ease: 'easeOut' }}
-      viewport={{ once: false, amount: 0.3 }}
-    >
-      {/* The text label */}
-      <div
-        className="annotation-2d-text"
-        style={{
-          left: `${label.labelX}%`,
-          top: `${label.labelY}%`,
-          transform: isLeft ? 'translate(-100%, -50%)' : 'translate(0%, -50%)',
-          textAlign: isLeft ? 'right' : 'left',
-          paddingRight: isLeft ? 8 : 0,
-          paddingLeft: isLeft ? 0 : 8,
-        }}
-      >
-        {label.text}
-      </div>
-
-      {/* Horizontal connector line */}
-      <div
-        className="annotation-2d-line"
-        style={{
-          left: `${lineLeft}%`,
-          top: `${label.labelY}%`,
-          width: `${lineWidth}%`,
-        }}
-      />
-
-      {/* Small dot at the controller end */}
-      <div
-        className="annotation-2d-dot"
-        style={{
-          left: `${label.pointX}%`,
-          top: `${label.labelY}%`,
-        }}
-      />
-    </motion.div>
-  );
-};
-
-const ControllerAnnotations = () => {
-  return (
-    <div className="annotations-overlay">
-      {annotations.map((label, i) => (
-        <Annotation2D key={label.id} label={label} index={i} />
-      ))}
-    </div>
-  );
-};
 
 const GameControllerSection = () => {
   const canvasRef = useRef<HTMLDivElement>(null)
@@ -410,14 +358,14 @@ const GameControllerSection = () => {
         .controller-intro {
           text-align: center;
           margin-top: -40px;
-          padding-bottom: 50px;
+          padding-bottom: 100px;
           z-index: 10;
           scale: 2;
         }
 
         .canvas-container {
           width: 100%;
-          max-width: 1200px;
+          max-width: 950px;
           aspect-ratio: 16 / 9;
           border-radius: 30px;
           background: black;
@@ -429,49 +377,7 @@ const GameControllerSection = () => {
           cursor: grabbing;
         }
 
-        /* ===== 2D Annotation Styles ===== */
-        .annotations-overlay {
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
-          z-index: 10;
-        }
-
-        .annotation-2d {
-          position: absolute;
-          inset: 0;
-          pointer-events: none;
-        }
-
-        .annotation-2d-text {
-          position: absolute;
-          font-family: 'Courier New', 'Consolas', monospace;
-          font-size: clamp(10px, 1.1vw, 15px);
-          font-weight: 600;
-          color: rgba(255, 255, 255, 0.8);
-          letter-spacing: 2px;
-          white-space: nowrap;
-          text-transform: uppercase;
-          user-select: none;
-        }
-
-        .annotation-2d-line {
-          position: absolute;
-          height: 1px;
-          background: rgba(255, 255, 255, 0.3);
-          transform: translateY(-0.5px);
-        }
-
-        .annotation-2d-dot {
-          position: absolute;
-          width: 6px;
-          height: 6px;
-          background: rgba(255, 255, 255, 0.7);
-          border-radius: 50%;
-          transform: translate(-50%, -50%);
-          box-shadow: 0 0 6px rgba(255, 255, 255, 0.3);
-        }
-
+        /* ── Responsive ── */
         @media (max-width: 768px) {
           .controller-section {
             padding: 0px 0px 40px;
@@ -481,6 +387,7 @@ const GameControllerSection = () => {
 
           .controller-title {
             font-size: 18px;
+            
           }
 
           .controller-subtitle {
@@ -491,14 +398,31 @@ const GameControllerSection = () => {
             aspect-ratio: 1;
             border-radius: 12px;
           }
+        }
 
-          .annotation-2d-text {
-            font-size: 7px;
-            letter-spacing: 0.5px;
+        /* ── Mobile Responsive (max-width: 475px) ── */
+        @media (max-width: 475px) {
+          .controller-section {
+            height: auto;
+            min-height: 60vh;
+            padding: 40px 8px 20px;
           }
 
-          .annotations-overlay {
-            display: none;
+          .controller-intro {
+            scale: 1 !important;
+            margin-top: 0;
+            padding-bottom: 24px;
+          }
+
+          .controller-title {
+            font-size: 16px;
+            letter-spacing: 0.15em;
+          }
+
+          .canvas-container {
+            max-width: 100%;
+            aspect-ratio: 4 / 3;
+            border-radius: 8px;
           }
         }
       `}</style>
@@ -514,7 +438,7 @@ const LoadingFallback = () => {
       display: "flex",
       alignItems: "center",
       justifyContent: "center",
-      color: "#888",
+      color: "#ffffff",
       fontSize: "16px",
       fontFamily: "monospace",
     }}>
@@ -525,5 +449,19 @@ const LoadingFallback = () => {
         Loading Controller...
       </motion.div>
     </div>
+  );
+};
+
+const Footer = () => {
+  return (
+    <footer className="footer">
+      <div className="footer-content">
+        <p className="footer-text">© {new Date().getFullYear()} DHRUBAJYOTI ROY. ALL RIGHTS RESERVED.</p>
+        <div className="footer-links">
+          <a href="#">SYSTEM.LOG</a>
+          <a href="#">TRANSMISSION</a>
+        </div>
+      </div>
+    </footer>
   );
 };
